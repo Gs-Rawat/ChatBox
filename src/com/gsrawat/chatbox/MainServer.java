@@ -3,10 +3,11 @@ package com.gsrawat.chatbox;
 import java.util.ArrayList;
 
 public class MainServer implements Subject {
+    private static MainServer mainServer = null;
     private ArrayList<Observer> list;
     private String message;
 
-    public MainServer() {
+    private MainServer() {
         this.list = new ArrayList<>();
     }
 
@@ -34,5 +35,12 @@ public class MainServer implements Subject {
     public void sendMessage(String message) {
             this.message = message;
             notifyObserver();
+    }
+
+    public synchronized static MainServer getMainServer() {
+        if (mainServer == null) {
+            mainServer = new MainServer();
+        }
+        return mainServer;
     }
 }

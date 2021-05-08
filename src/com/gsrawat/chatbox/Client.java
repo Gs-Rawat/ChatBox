@@ -10,11 +10,14 @@ public class Client implements Observer, Runnable {
     private BufferedReader reader;
     private DataInputStream dataReader;
     private DataOutputStream dataWriter;
+    private MainServer mainServer;
 
     public Client(Socket client) {
         this.client = client;
         this.msgList = new ArrayList<>();
         this.reader = new BufferedReader(new InputStreamReader(System.in));
+        this.mainServer = MainServer.getMainServer();
+        this.mainServer.registerObserver(this);
         setReaderWriter();
     }
 
@@ -49,7 +52,19 @@ public class Client implements Observer, Runnable {
     }
 
     public String process(String msg) {
-        return msg;
+        StringBuilder builder = new StringBuilder();
+
+        if(msg.startsWith("send_msg:")) {
+            msg = msg.substring("send_msg:".length()).trim();
+            mainServer.sendMessage(msg);
+            builder.append("Message Send.");
+        }
+        else if(msg.startsWith("get_msg:")) {
+            for(String str : msgList) {
+                builder.append(str).append("\n");
+            }
+        }
+        return builder.toString();
     }
 
     @Override
