@@ -14,12 +14,34 @@ public class Client {
     private static DataOutputStream dataWriter;
     private static BufferedReader reader;
 
+    public static void login() throws Exception {
+        System.out.println("Login\n");
+
+        dataWriter.writeUTF("login:");
+        while(true) {
+            // read
+            String out = dataReader.readUTF();
+            System.out.print(out);
+
+            if(out.startsWith("Login successful")) {
+                System.out.println("\n");
+                break;
+            }
+
+            //write
+            String inp = reader.readLine();
+            dataWriter.writeUTF(inp);
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         Socket client = new Socket("localhost", 7000);
 
         dataReader = new DataInputStream(client.getInputStream());
         dataWriter = new DataOutputStream(client.getOutputStream());
         reader = new BufferedReader(new InputStreamReader(System.in));
+
+        login();
 
         String sendMsg = "";
         while(!sendMsg.equals(":exit")) {
