@@ -1,46 +1,28 @@
 package com.gsrawat.chatbox;
 
-import java.util.ArrayList;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-public class MainServer implements Subject {
-    private static MainServer mainServer = null;
-    private ArrayList<Observer> list;
-    private String message;
+public class MainServer {
+    private static int count = 0;
 
-    private MainServer() {
-        this.list = new ArrayList<>();
+    public static void log(Socket client) {
+        String ip = client.getInetAddress().getHostAddress();
+        ++count;
+        System.out.println(ip + ", [client count : " + count + "]");
     }
 
-    @Override
-    public void registerObserver(Observer o) {
-        list.add(o);
-    }
+    public static void main(String[] args) throws Exception {
+        ServerSocket server = new ServerSocket(7000);
+        System.out.println("Server successfully started at port : " + 7000);
 
-    @Override
-    public void removeObserver(Observer o) {
-        list.add(o);
-    }
+        while(true) {
+            Socket client = server.accept();
+            log(client);
 
-    @Override
-    public void notifyObserver() {
-        for(Observer o: list) {
-            o.update(this);
+            ClientHandler observer = new ClientHandler(client, count);
+            Thread thread = new Thread(observer);
+            thread.start();
         }
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public void sendMessage(String message) {
-            this.message = message;
-            notifyObserver();
-    }
-
-    public synchronized static MainServer getMainServer() {
-        if (mainServer == null) {
-            mainServer = new MainServer();
-        }
-        return mainServer;
     }
 }

@@ -5,25 +5,25 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Client implements Observer, Runnable {
+public class ClientHandler implements Observer, Runnable {
     private Socket client;
     private ArrayList<String> msgList;
     private BufferedReader reader;
     private DataInputStream dataReader;
     private DataOutputStream dataWriter;
-    private MainServer mainServer;
+    private BroadcastServer broadcastServer;
     private String clientName;
     private String clientCountry;
     private int clientCode;
     private Date date;
 
-    public Client(Socket client, int clientCode) {
+    public ClientHandler(Socket client, int clientCode) {
         this.client = client;
         this.clientCode = clientCode;
         this.msgList = new ArrayList<>();
         this.reader = new BufferedReader(new InputStreamReader(System.in));
-        this.mainServer = MainServer.getMainServer();
-        this.mainServer.registerObserver(this);
+        this.broadcastServer = BroadcastServer.getBroadCastServer();
+        this.broadcastServer.registerObserver(this);
         this.date = new Date();
         setReaderWriter();
     }
@@ -39,8 +39,8 @@ public class Client implements Observer, Runnable {
 
     @Override
     public void update(Subject s) {
-        MainServer mainServer = (MainServer) s;
-        msgList.add(mainServer.getMessage());
+        BroadcastServer broadcastServer = (BroadcastServer) s;
+        msgList.add(broadcastServer.getMessage());
     }
 
     public void readProcessWrite() {
@@ -78,7 +78,7 @@ public class Client implements Observer, Runnable {
             msg = msg.substring("send_msg:".length()).trim();
             String time = date.toString();
             String start = "[" + clientName + ": " + time + "] ";
-            mainServer.sendMessage(start + msg);
+            broadcastServer.sendMessage(start + msg);
             builder.append("Message Send.");
         }
         else if(msg.startsWith("get_msg:")) {
