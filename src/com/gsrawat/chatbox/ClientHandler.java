@@ -82,6 +82,9 @@ public class ClientHandler implements Observer, Runnable {
 
     public String sendMsg(String msg) {
         msg = msg.substring("send_msg:".length()).trim();
+
+        if(msg.length() == 0) return "Can't send empty message";
+
         String time = date.toString();
         String start = "[" + clientName + ": " + time + "] ";
         broadcastServer.sendMessage(start + msg);
@@ -106,7 +109,7 @@ public class ClientHandler implements Observer, Runnable {
     }
 
     public String process(String msg) {
-
+        msg = msg.trim();
         if (msg.startsWith("send_msg:")) {
             return sendMsg(msg);
         } else if (msg.startsWith("get_msg:")) {
