@@ -44,7 +44,7 @@ public class Client {
         login();
 
         String sendMsg = "";
-        while(!sendMsg.equals(":exit")) {
+        while(!sendMsg.equals("logout:")) {
             // read
             System.out.print(YELLOW + "> " + RESET);
             sendMsg = reader.readLine();

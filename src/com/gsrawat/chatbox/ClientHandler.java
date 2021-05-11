@@ -8,10 +8,10 @@ import java.util.Date;
 public class ClientHandler implements Observer, Runnable {
     private Socket client;
     private ArrayList<String> msgList;
-    private BufferedReader reader;
     private DataInputStream dataReader;
     private DataOutputStream dataWriter;
     private BroadcastServer broadcastServer;
+    private boolean isAlive;
     private String clientName;
     private String clientCountry;
     private int clientCode;
@@ -22,7 +22,6 @@ public class ClientHandler implements Observer, Runnable {
         this.client = client;
         this.clientCode = clientCode;
         this.msgList = new ArrayList<>();
-        this.reader = new BufferedReader(new InputStreamReader(System.in));
         this.date = new Date();
         this.updateMsgCount = 0;
         setReaderWriter();
@@ -31,6 +30,7 @@ public class ClientHandler implements Observer, Runnable {
     public void registerMe() {
         this.broadcastServer = BroadcastServer.getBroadCastServer();
         this.broadcastServer.registerObserver(this);
+        this.isAlive = true;
     }
 
     public void setReaderWriter() {
@@ -58,7 +58,14 @@ public class ClientHandler implements Observer, Runnable {
                 String out = process(msg);
                 //write
                 dataWriter.writeUTF(out);
+
+                if(!isAlive) break;
             }
+
+            // closing connection
+            dataReader.close();
+            dataWriter.close();
+            client.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,6 +100,10 @@ public class ClientHandler implements Observer, Runnable {
     }
 
     public String getMsg() {
+        if(msgList.isEmpty()) {
+            return "Message box is empty.";
+        }
+
         StringBuilder builder = new StringBuilder();
         for (String str : msgList) {
             builder.append(str).append("\n");
@@ -108,6 +119,13 @@ public class ClientHandler implements Observer, Runnable {
         return "UPDATE: " + updateMsgCount + " new message.";
     }
 
+    public String logout() {
+        broadcastServer.removeObserver(this);
+        broadcastServer.sendMessage(clientName + " left the chat.");
+        isAlive = false;
+        return "Successfully logout";
+    }
+
     public String process(String msg) {
         msg = msg.trim();
         if (msg.startsWith("send_msg:")) {
@@ -118,6 +136,8 @@ public class ClientHandler implements Observer, Runnable {
             return manageLogin();
         } else if(msg.startsWith("update:")) {
             return updateHandler();
+        } else if(msg.startsWith("logout:")) {
+            return logout();
         } else {
             return "Invalid command";
         }

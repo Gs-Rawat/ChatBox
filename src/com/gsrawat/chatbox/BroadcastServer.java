@@ -18,7 +18,7 @@ public class BroadcastServer implements Subject {
 
     @Override
     public void removeObserver(Observer o) {
-        list.add(o);
+        list.remove(o);
     }
 
     @Override
