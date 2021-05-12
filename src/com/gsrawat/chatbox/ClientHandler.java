@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ClientHandler implements Observer, Runnable {
+    public static final String RESET = "\u001B[0m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String RED = "\u001B[31m";
     private Socket client;
     private ArrayList<String> msgList;
     private DataInputStream dataReader;
@@ -84,6 +87,8 @@ public class ClientHandler implements Observer, Runnable {
         }
 
         registerMe();
+        // broadcast everyone
+        broadcastServer.sendMessage(GREEN + clientName + " joined the chat" + RESET);
         return "Login successful " + "[" + clientName + " from " + clientCountry + "]";
     }
 
@@ -121,7 +126,8 @@ public class ClientHandler implements Observer, Runnable {
 
     public String logout() {
         broadcastServer.removeObserver(this);
-        broadcastServer.sendMessage(clientName + " left the chat.");
+        //broadcast everyone
+        broadcastServer.sendMessage(RED + clientName + " left the chat." + RESET);
         isAlive = false;
         return "Successfully logout";
     }
