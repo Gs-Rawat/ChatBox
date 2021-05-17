@@ -37,6 +37,10 @@ public class BroadcastServer implements Subject {
             notifyObserver();
     }
 
+    public ArrayList<Observer> getOnline() {
+        return this.list;
+    }
+
     public synchronized static BroadcastServer getBroadCastServer() {
         if (broadcastServer == null) {
             broadcastServer = new BroadcastServer();

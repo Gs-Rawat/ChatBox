@@ -1,5 +1,7 @@
 package com.gsrawat.chatbox;
 
+import com.gsrawat.chatboxclient.Client;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -132,6 +134,17 @@ public class ClientHandler implements Observer, Runnable {
         return "Successfully logout";
     }
 
+    public String online() {
+        ArrayList<Observer> list = broadcastServer.getOnline();
+        StringBuilder builder = new StringBuilder();
+        builder.append(list.size()).append(" online\n");
+        for(Observer obs: list) {
+            String clientName = ((ClientHandler)obs).clientName;
+            builder.append(clientName).append("\n");
+        }
+        return builder.toString();
+    }
+
     public String process(String msg) {
         msg = msg.trim();
         if (msg.startsWith("send_msg:")) {
@@ -144,6 +157,8 @@ public class ClientHandler implements Observer, Runnable {
             return updateHandler();
         } else if(msg.startsWith("logout:")) {
             return logout();
+        } else if(msg.startsWith("online:")) {
+            return online();
         } else {
             return "Invalid command";
         }
