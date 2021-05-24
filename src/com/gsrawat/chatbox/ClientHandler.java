@@ -11,6 +11,8 @@ public class ClientHandler implements Observer, Runnable {
     public static final String RESET = "\u001B[0m";
     public static final String GREEN = "\u001B[32m";
     public static final String RED = "\u001B[31m";
+    public static final String BLUE = "\033[0;94m";
+    public static final String CYAN = "\033[1;96m";
     private Socket client;
     private ArrayList<String> msgList;
     private DataInputStream dataReader;
@@ -20,14 +22,12 @@ public class ClientHandler implements Observer, Runnable {
     private String clientName;
     private String clientCountry;
     private int clientCode;
-    private Date date;
     private int updateMsgCount;
 
     public ClientHandler(Socket client, int clientCode) {
         this.client = client;
         this.clientCode = clientCode;
         this.msgList = new ArrayList<>();
-        this.date = new Date();
         this.updateMsgCount = 0;
         setReaderWriter();
     }
@@ -78,12 +78,14 @@ public class ClientHandler implements Observer, Runnable {
 
     public String manageLogin() {
         try {
-            dataWriter.writeUTF("Enter your name: ");
-            this.clientName = dataReader.readUTF();
+            do {
+                dataWriter.writeUTF("Enter your name: ");
+                this.clientName = dataReader.readUTF().trim();
 
-            dataWriter.writeUTF("Enter you country: ");
-            this.clientCountry = dataReader.readUTF();
+                dataWriter.writeUTF("Enter you country: ");
+                this.clientCountry = dataReader.readUTF().trim();
 
+            } while (this.clientName.isEmpty() || this.clientCountry.isEmpty());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,8 +101,8 @@ public class ClientHandler implements Observer, Runnable {
 
         if(msg.length() == 0) return "Can't send empty message";
 
-        String time = date.toString();
-        String start = "[" + clientName + ": " + time + "] ";
+        String time = new Date().toString();
+        String start = BLUE + "[" + CYAN + clientName + ": " + BLUE + time + "]: " + RESET;
         broadcastServer.sendMessage(start + msg);
         --updateMsgCount;
         return "Message has been sent.";

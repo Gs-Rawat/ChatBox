@@ -18,12 +18,12 @@ public class Client {
         System.out.println("Login\n");
 
         dataWriter.writeUTF("login:");
-        while(true) {
+        while (true) {
             // read
             String out = dataReader.readUTF();
             System.out.print(out);
 
-            if(out.startsWith("Login successful")) {
+            if (out.startsWith("Login successful")) {
                 System.out.println("\n");
                 break;
             }
@@ -44,7 +44,7 @@ public class Client {
         login();
 
         String sendMsg = "";
-        while(!sendMsg.equals("logout:")) {
+        while (!sendMsg.equals("logout:")) {
             // read
             System.out.print(YELLOW + "> " + RESET);
             sendMsg = reader.readLine();
