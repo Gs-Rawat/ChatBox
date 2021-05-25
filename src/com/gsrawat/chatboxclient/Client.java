@@ -9,6 +9,7 @@ import java.net.Socket;
 public class Client {
     public static final String YELLOW = "\u001B[33m";
     public static final String RESET = "\u001B[0m";
+    public static final String BLUE_BRIGHT = "\033[0;94m";
 
     private static DataInputStream dataReader;
     private static DataOutputStream dataWriter;
@@ -32,6 +33,7 @@ public class Client {
             String inp = reader.readLine();
             dataWriter.writeUTF(inp);
         }
+        System.out.println("Type " + BLUE_BRIGHT + "help: " + RESET + "to view all commands");
     }
 
     public static void main(String[] args) throws Exception {

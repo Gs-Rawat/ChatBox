@@ -1,8 +1,7 @@
 package com.gsrawat.chatbox;
 
-import com.gsrawat.chatboxclient.Client;
-
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,15 +12,16 @@ public class ClientHandler implements Observer, Runnable {
     public static final String RED = "\u001B[31m";
     public static final String BLUE = "\033[0;94m";
     public static final String CYAN = "\033[1;96m";
-    private Socket client;
-    private ArrayList<String> msgList;
+    public static final String BLUE_BRIGHT = "\033[0;94m";
+    private final Socket client;
+    private final ArrayList<String> msgList;
+    private final int clientCode;
     private DataInputStream dataReader;
     private DataOutputStream dataWriter;
     private BroadcastServer broadcastServer;
     private boolean isAlive;
     private String clientName;
     private String clientCountry;
-    private int clientCode;
     private int updateMsgCount;
 
     public ClientHandler(Socket client, int clientCode) {
@@ -64,7 +64,7 @@ public class ClientHandler implements Observer, Runnable {
                 //write
                 dataWriter.writeUTF(out);
 
-                if(!isAlive) break;
+                if (!isAlive) break;
             }
 
             // closing connection
@@ -99,7 +99,7 @@ public class ClientHandler implements Observer, Runnable {
     public String sendMsg(String msg) {
         msg = msg.substring("send_msg:".length()).trim();
 
-        if(msg.length() == 0) return "Can't send empty message";
+        if (msg.length() == 0) return "Can't send empty message";
 
         String time = new Date().toString();
         String start = BLUE + "[" + CYAN + clientName + ": " + BLUE + time + "]: " + RESET;
@@ -109,7 +109,7 @@ public class ClientHandler implements Observer, Runnable {
     }
 
     public String getMsg() {
-        if(msgList.isEmpty()) {
+        if (msgList.isEmpty()) {
             return "Message box is empty.";
         }
 
@@ -122,7 +122,7 @@ public class ClientHandler implements Observer, Runnable {
     }
 
     public String updateHandler() {
-        if(updateMsgCount == 0) {
+        if (updateMsgCount == 0) {
             return "No new messages. You are up to date.";
         }
         return "UPDATE: " + updateMsgCount + " new message.";
@@ -140,11 +140,20 @@ public class ClientHandler implements Observer, Runnable {
         ArrayList<Observer> list = broadcastServer.getOnline();
         StringBuilder builder = new StringBuilder();
         builder.append(list.size()).append(" online\n");
-        for(Observer obs: list) {
-            String clientName = ((ClientHandler)obs).clientName;
+        for (Observer obs : list) {
+            String clientName = ((ClientHandler) obs).clientName;
             builder.append(clientName).append("\n");
         }
         return builder.toString();
+    }
+
+    public String help() {
+        return BLUE_BRIGHT + "get_msg: " + RESET + "get all the messages\n" +
+                BLUE_BRIGHT + "help: " + RESET + "display all the commands\n" +
+                BLUE_BRIGHT + "logout: " + RESET + "leave the chatroom\n" +
+                BLUE_BRIGHT + "online: " + RESET + "check how many people are online\n" +
+                BLUE_BRIGHT + "send_msg: " + RESET + "send text\n" +
+                BLUE_BRIGHT + "update: " + RESET + "check if there is any new message\n";
     }
 
     public String process(String msg) {
@@ -155,12 +164,14 @@ public class ClientHandler implements Observer, Runnable {
             return getMsg();
         } else if (msg.startsWith("login:")) {
             return manageLogin();
-        } else if(msg.startsWith("update:")) {
+        } else if (msg.startsWith("update:")) {
             return updateHandler();
-        } else if(msg.startsWith("logout:")) {
+        } else if (msg.startsWith("logout:")) {
             return logout();
-        } else if(msg.startsWith("online:")) {
+        } else if (msg.startsWith("online:")) {
             return online();
+        } else if (msg.startsWith("help:")) {
+            return help();
         } else {
             return "Invalid command";
         }
