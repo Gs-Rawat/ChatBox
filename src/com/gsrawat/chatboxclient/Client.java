@@ -59,9 +59,9 @@ public class Client {
             System.out.println(out);
         }
 
-        client.close();
         reader.close();
         dataReader.close();
         dataWriter.close();
+        client.close();
     }
 }

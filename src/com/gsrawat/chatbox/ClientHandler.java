@@ -15,7 +15,6 @@ public class ClientHandler implements Observer, Runnable {
     public static final String BLUE_BRIGHT = "\033[0;94m";
     private final Socket client;
     private final ArrayList<String> msgList;
-    private final int clientCode;
     private DataInputStream dataReader;
     private DataOutputStream dataWriter;
     private BroadcastServer broadcastServer;
@@ -24,9 +23,8 @@ public class ClientHandler implements Observer, Runnable {
     private String clientCountry;
     private int updateMsgCount;
 
-    public ClientHandler(Socket client, int clientCode) {
+    public ClientHandler(Socket client) {
         this.client = client;
-        this.clientCode = clientCode;
         this.msgList = new ArrayList<>();
         this.updateMsgCount = 0;
         setReaderWriter();
@@ -56,7 +54,7 @@ public class ClientHandler implements Observer, Runnable {
 
     public void readProcessWrite() {
         try {
-            while (true) {
+            do {
                 //read
                 String msg = dataReader.readUTF();
                 //process
@@ -64,8 +62,7 @@ public class ClientHandler implements Observer, Runnable {
                 //write
                 dataWriter.writeUTF(out);
 
-                if (!isAlive) break;
-            }
+            } while (isAlive);
 
             // closing connection
             dataReader.close();

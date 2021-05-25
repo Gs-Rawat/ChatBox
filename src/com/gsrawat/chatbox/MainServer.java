@@ -20,7 +20,7 @@ public class MainServer {
             Socket client = server.accept();
             log(client);
 
-            ClientHandler observer = new ClientHandler(client, count);
+            ClientHandler observer = new ClientHandler(client);
             Thread thread = new Thread(observer);
             thread.start();
         }
