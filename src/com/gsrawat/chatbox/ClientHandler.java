@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ClientHandler implements Observer, Runnable {
+class ClientHandler implements Observer, Runnable {
     public static final String RESET = "\u001B[0m";
     public static final String GREEN = "\u001B[32m";
     public static final String RED = "\u001B[31m";

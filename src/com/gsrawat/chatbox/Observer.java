@@ -1,5 +1,5 @@
 package com.gsrawat.chatbox;
 
-public interface Observer {
+interface Observer {
     void update(Subject s);
 }
